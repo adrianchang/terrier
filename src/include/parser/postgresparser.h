@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "libpg_query/pg_query.h"
+#include "parsenodes.h"
 #include "parser/parsenodes.h"
 #include "parser/statements.h"
 
@@ -206,6 +207,7 @@ class PostgresParser {
   static std::unique_ptr<SQLStatement> CreateSchemaTransform(ParseResult *parse_result, CreateSchemaStmt *root);
   static std::unique_ptr<SQLStatement> CreateTriggerTransform(ParseResult *parse_result, CreateTrigStmt *root);
   static std::unique_ptr<SQLStatement> CreateViewTransform(ParseResult *parse_result, ViewStmt *root);
+  static std::unique_ptr<SQLStatement> CreateSequenceTransform(ParseResult *parse_result, CreateSeqStmt *root);
 
   // CREATE helpers
   using ColumnDefTransResult = struct {
@@ -289,6 +291,15 @@ class PostgresParser {
    * - returning a list
    */
   static std::unique_ptr<UpdateStatement> UpdateTransform(ParseResult *parse_result, UpdateStmt *update_stmt);
+
+  /**
+   * Helper function to get long value from defelem node
+   * @param defel
+   * @return value
+   */
+  static int64_t get_long_in_defel(DefElem *defel) {
+    return (int64_t)((reinterpret_cast<value *>(defel->arg_))->val_.ival_);
+  };
 };
 
 }  // namespace terrier::parser

@@ -7,6 +7,7 @@
 #include <utility>
 #include <vector>
 
+#include "../include/parser/create_statement.h"
 #include "binder/binder_sherpa.h"
 #include "catalog/catalog_accessor.h"
 #include "catalog/catalog_defs.h"
@@ -310,6 +311,14 @@ void BindNodeVisitor::Visit(common::ManagedPointer<parser::CreateStatement> node
           if (!find) throw BINDER_EXCEPTION(("Cannot find column " + src[i] + " in foreign key source").c_str());
         }
       }
+      break;
+    case parser::CreateStatement::CreateType::kSequence:
+      ValidateDatabaseName(node->GetDatabaseName());
+      if (catalog_accessor_->GetTableOid(node->GetTableName()) == catalog::INVALID_TABLE_OID) {
+        throw BINDER_EXCEPTION("Build index on non-existing table.");
+      }
+
+      //TODO not sure what to do here
       break;
     case parser::CreateStatement::CreateType::kIndex:
       ValidateDatabaseName(node->GetDatabaseName());

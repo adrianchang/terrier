@@ -241,6 +241,20 @@ TEST_F(ParserTestBase, CreateTableTest) {
 }
 
 // NOLINTNEXTLINE
+TEST_F(ParserTestBase, CreateSequenceTest) {
+  std::string query = "CREATE SEQUENCE seq INCREMENT BY 2 MINVALUE 10 MAXVALUE 50 START 10 CYCLE;";
+  auto result = parser::PostgresParser::BuildParseTree(query);
+  auto create_stmt = result->GetStatement(0).CastManagedPointerTo<CreateStatement>();
+
+  EXPECT_EQ(create_stmt->GetSeqSatart(), 10);
+  EXPECT_EQ(create_stmt->GetSeqIncrement(), 2);
+  EXPECT_EQ(create_stmt->GetSeqMaxValue(), 50);
+  EXPECT_EQ(create_stmt->GetSeqValue(), 10);
+  EXPECT_EQ(create_stmt->GetSeqCyle(), true);
+  EXPECT_EQ(create_stmt->GetSeqCache(), 0);
+}
+
+// NOLINTNEXTLINE
 TEST_F(ParserTestBase, CreateViewTest) {
   auto result = parser::PostgresParser::BuildParseTree("CREATE VIEW foo AS SELECT * FROM bar WHERE baz = 1;");
   auto create_stmt = result->GetStatement(0).CastManagedPointerTo<CreateStatement>();

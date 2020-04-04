@@ -714,6 +714,14 @@ using CreateSchemaStmt = struct CreateSchemaStmt {
   bool if_not_exists_; /* just do nothing if schema already exists? */
 };
 
+using CreateSeqStmt = struct CreateSeqStmt {
+  NodeTag type_;
+  RangeVar *sequence_; /* the sequence to create */
+  List *options_;
+  Oid ownerId_;        /* ID of owner, or InvalidOid for default */
+  bool if_not_exists_; /* just do nothing if it already exists? */
+};
+
 using RoleSpecType = enum RoleSpecType {
   ROLESPEC_CSTRING,      /* role name is stored as a C string */
   ROLESPEC_CURRENT_USER, /* role spec is CURRENT_USER */
@@ -813,3 +821,4 @@ using FunctionParameter = struct FunctionParameter {
   FunctionParameterMode mode_; /* IN/OUT/etc */
   Node *defexpr_;              /* raw default expr, or NULL if not given */
 };
+

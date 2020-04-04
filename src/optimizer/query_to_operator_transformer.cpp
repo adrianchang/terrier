@@ -309,6 +309,13 @@ void QueryToOperatorTransformer::Visit(common::ManagedPointer<parser::CreateStat
       //  Following part might be more adequate to be handled by optimizer when it it actually constructing the plan
       //  I don't think we should extract out the desired fields here.
       break;
+    case parser::CreateStatement::CreateType::kSequence:
+      // TODO adrian not sure what to do here.
+      create_expr = std::make_unique<OperatorNode>(
+          LogicalCreateTable::Make(accessor_->GetNamespaceOid(op->GetNamespaceName()), op->GetTableName(),
+                                   op->GetColumns(), op->GetForeignKeys()),
+          std::vector<std::unique_ptr<OperatorNode>>{});
+      break;
     case parser::CreateStatement::CreateType::kIndex: {
       // create vector of expressions of the index entires
       std::vector<common::ManagedPointer<parser::AbstractExpression>> entries;

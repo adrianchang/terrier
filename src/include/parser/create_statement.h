@@ -383,7 +383,7 @@ class CreateStatement : public TableRefStatement {
   /**
    * Create statement type.
    */
-  enum CreateType { kTable, kDatabase, kIndex, kTrigger, kSchema, kView };
+  enum CreateType { kTable, kSequence, kDatabase, kIndex, kTrigger, kSchema, kView};
 
   /**
    * CREATE TABLE and CREATE DATABASE
@@ -399,6 +399,30 @@ class CreateStatement : public TableRefStatement {
         create_type_(create_type),
         columns_(std::move(columns)),
         foreign_keys_(std::move(foreign_keys)) {}
+
+  /**
+  * CREATE SEQUENCE
+  * @param table_info table information
+  * @param create_type create type, must be either kTable or kDatabase
+  * @param columns columns to be created
+  *
+  */
+  CreateStatement(std::unique_ptr<TableInfo> table_info, CreateType create_type,
+                  int32_t seq_start,
+                  int32_t seq_increment,
+                  int32_t seq_max_value,
+                  int32_t seq_min_value,
+                  int32_t seq_cache,
+                  bool seq_cycle)
+      : TableRefStatement(StatementType::CREATE, std::move(table_info)),
+        create_type_(create_type),
+        seq_start_(seq_start),
+        seq_increment_(seq_increment),
+        seq_max_value_(seq_max_value),
+        seq_min_value_(seq_min_value),
+        seq_cache_(seq_cache),
+        seq_cycle_(seq_cycle) {}
+
 
   /**
    * CREATE INDEX
@@ -491,6 +515,24 @@ class CreateStatement : public TableRefStatement {
     return foreign_keys;
   }
 
+  /** @return sequence's seq_start_  */
+  int32_t GetSeqSatart() { return seq_start_; }
+
+  /** @return sequence's seq_increment_  */
+  int32_t GetSeqIncrement () { return seq_increment_; }
+
+  /** @return sequence's seq_max_value_  */
+  int32_t GetSeqMaxValue() { return seq_max_value_; }
+
+  /** @return sequence's seq_min_value_  */
+  int32_t GetSeqValue() { return seq_min_value_; }
+
+  /** @return sequence's seq_cache_  */
+  int32_t GetSeqCache() { return seq_cache_; }
+
+  /** @return sequence's seq_cycle_  */
+  int32_t GetSeqCyle() { return seq_cycle_; }
+
   /** @return index type for [CREATE INDEX] */
   IndexType GetIndexType() { return index_type_; }
 
@@ -537,6 +579,14 @@ class CreateStatement : public TableRefStatement {
   // CREATE TABLE, CREATE DATABASE
   const std::vector<std::unique_ptr<ColumnDefinition>> columns_;
   const std::vector<std::unique_ptr<ColumnDefinition>> foreign_keys_;
+
+  // CREATE SEQUENCE
+  int32_t seq_start_;
+  int32_t seq_increment_;
+  int32_t seq_max_value_;
+  int32_t seq_min_value_;
+  int32_t seq_cache_;
+  bool seq_cycle_;
 
   // CREATE INDEX
   const IndexType index_type_ = IndexType::INVALID;

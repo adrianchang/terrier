@@ -8,6 +8,8 @@
 #include <utility>
 #include <vector>
 
+#include "../include/parser/create_statement.h"
+#include "../include/parser/parsenodes.h"
 #include "common/exception.h"
 #include "libpg_query/pg_list.h"
 #include "libpg_query/pg_query.h"
@@ -94,6 +96,10 @@ std::unique_ptr<SQLStatement> PostgresParser::NodeTransform(ParseResult *parse_r
     }
     case T_CreateStmt: {
       result = CreateTransform(parse_result, reinterpret_cast<CreateStmt *>(node));
+      break;
+    }
+    case T_CreateSeqStmt: {
+      result = CreateSequenceTransform(parse_result, reinterpret_cast<CreateSeqStmt *>(node));
       break;
     }
     case T_CreatedbStmt: {
@@ -1211,6 +1217,83 @@ std::unique_ptr<SQLStatement> PostgresParser::CreateTransform(ParseResult *parse
 
   auto result = std::make_unique<CreateStatement>(std::move(table_info), CreateStatement::CreateType::kTable,
                                                   std::move(columns), std::move(foreign_keys));
+  return result;
+}
+
+// Postgres.CreateSeqStmt -> terrier.CreateSequenceStatement
+std::unique_ptr<parser::SQLStatement> PostgresParser::CreateSequenceTransform(ParseResult *parse_result,
+                                                                              CreateSeqStmt *root) {
+  RangeVar *relation = root->sequence_;
+  auto table_name = relation->relname_ != nullptr ? relation->relname_ : "";
+  auto schema_name = relation->schemaname_ != nullptr ? relation->schemaname_ : "";
+  auto database_name = relation->catalogname_ != nullptr ? relation->catalogname_ : "";
+  std::unique_ptr<TableInfo> table_info = std::make_unique<TableInfo>(table_name, schema_name, database_name);
+
+  DefElem *increment = NULL;
+  DefElem *start = NULL;
+  DefElem *maxvalue = NULL;
+  DefElem *minvalue = NULL;
+  DefElem *cache = NULL;
+  DefElem *cycle = NULL;
+
+  int64_t increment_value = 0;
+  int64_t start_value = 0;
+  int64_t maxvalue_value = 0;
+  int64_t minvalue_value = 0;
+  int64_t cache_value = 0;
+  bool cycle_value = false;
+
+  for (auto cell = root->options_->head; cell != nullptr; cell = cell->next) {
+    auto def_elem = reinterpret_cast<DefElem *>(cell->data.ptr_value);
+
+    if (strcmp(def_elem->defname_, "increment") == 0) {
+      if (increment) {
+        PARSER_LOG_AND_THROW("Redundant increment option", "Sequence options", def_elem->defname_);
+      }
+      increment = def_elem;
+      increment_value = get_long_in_defel(def_elem);
+    }else if (strcmp(def_elem->defname_, "start") == 0) {
+      if (start) {
+        PARSER_LOG_AND_THROW("Redundant start option", "Sequence options", def_elem->defname_);
+      }
+      start = def_elem;
+      start_value = get_long_in_defel(def_elem);
+    }else if (strcmp(def_elem->defname_, "maxvalue") == 0) {
+      if (maxvalue) {
+        PARSER_LOG_AND_THROW("Redundant maxvalue option", "Sequence options", def_elem->defname_);
+      }
+      maxvalue = def_elem;
+      maxvalue_value = get_long_in_defel(def_elem);
+    }else if (strcmp(def_elem->defname_, "minvalue") == 0) {
+      if (minvalue) {
+        PARSER_LOG_AND_THROW("Redundant minvalue option", "Sequence options", def_elem->defname_);
+      }
+      minvalue = def_elem;
+      minvalue_value = get_long_in_defel(def_elem);
+    }else if (strcmp(def_elem->defname_, "cache") == 0) {
+      if (cache) {
+        PARSER_LOG_AND_THROW("Redundant cache option", "Sequence options", def_elem->defname_);
+      }
+      cache = def_elem;
+      cache_value = get_long_in_defel(def_elem);
+    }else if (strcmp(def_elem->defname_, "cycle") == 0) {
+      if (cycle) {
+        PARSER_LOG_AND_THROW("Redundant cycle option", "Sequence options", def_elem->defname_);
+      }
+      cycle = def_elem;
+      cycle_value = (bool)get_long_in_defel(def_elem);
+    }else {
+      PARSER_LOG_AND_THROW("Option not recognized", "Sequence options", def_elem->defname_);
+    }
+  }
+
+  auto result = std::make_unique<CreateStatement>(std::move(table_info), CreateStatement::CreateType::kSequence,
+                                                  start_value,
+                                                  increment_value,
+                                                  maxvalue_value,
+                                                  minvalue_value,
+                                                  cache_value,
+                                                  cycle_value);
   return result;
 }
 
