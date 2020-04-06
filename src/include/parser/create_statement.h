@@ -408,6 +408,7 @@ class CreateStatement : public TableRefStatement {
   *
   */
   CreateStatement(std::unique_ptr<TableInfo> table_info, CreateType create_type,
+                  std::string seq_name,
                   int32_t seq_start,
                   int32_t seq_increment,
                   int32_t seq_max_value,
@@ -416,6 +417,7 @@ class CreateStatement : public TableRefStatement {
                   bool seq_cycle)
       : TableRefStatement(StatementType::CREATE, std::move(table_info)),
         create_type_(create_type),
+        seq_name_(seq_name),
         seq_start_(seq_start),
         seq_increment_(seq_increment),
         seq_max_value_(seq_max_value),
@@ -515,8 +517,11 @@ class CreateStatement : public TableRefStatement {
     return foreign_keys;
   }
 
+  /** @return sequence's name        */
+  std::string GetSeqName() { return seq_name_; }
+
   /** @return sequence's seq_start_  */
-  int32_t GetSeqSatart() { return seq_start_; }
+  int32_t GetSeqStart() { return seq_start_; }
 
   /** @return sequence's seq_increment_  */
   int32_t GetSeqIncrement () { return seq_increment_; }
@@ -581,6 +586,7 @@ class CreateStatement : public TableRefStatement {
   const std::vector<std::unique_ptr<ColumnDefinition>> foreign_keys_;
 
   // CREATE SEQUENCE
+  std::string seq_name_;
   int32_t seq_start_;
   int32_t seq_increment_;
   int32_t seq_max_value_;

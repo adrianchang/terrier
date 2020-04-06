@@ -1004,6 +1004,7 @@ index_oid_t DatabaseCatalog::CreateIndex(const common::ManagedPointer<transactio
   return CreateIndexEntry(txn, ns, table, index_oid, name, schema) ? index_oid : INVALID_INDEX_OID;
 }
 
+
 bool DatabaseCatalog::DeleteIndex(const common::ManagedPointer<transaction::TransactionContext> txn,
                                   index_oid_t index) {
   if (!TryLock(txn)) return false;
@@ -1146,6 +1147,20 @@ bool DatabaseCatalog::DeleteIndex(const common::ManagedPointer<transaction::Tran
   delete[] buffer;
   return true;
 }
+
+//TODO(Tianhan) : add real create and drop
+sequence_oid_t CreateSequence(common::ManagedPointer<transaction::TransactionContext> txn, const std::string name,
+                                  int32_t sequence_start, int32_t sequence_increment, int32_t sequence_max_value,
+                                  int32_t sequence_min_value, int32_t sequence_cache, bool sequence_cycle) {
+    std::cout << "In database_catalog, create sequence\n";
+    return INVALID_SEQUENCE_OID;
+}
+
+bool DropSequence(common::ManagedPointer<transaction::TransactionContext> txn, sequence_oid_t index){
+    std::cout << "In database_catalog, drop sequence\n";
+    return true;
+}
+
 
 bool DatabaseCatalog::SetTableSchemaPointer(const common::ManagedPointer<transaction::TransactionContext> txn,
                                             const table_oid_t oid, const Schema *const schema) {

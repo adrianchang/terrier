@@ -119,11 +119,22 @@ index_oid_t CatalogAccessor::CreateIndex(namespace_oid_t ns, table_oid_t table, 
   return dbc_->CreateIndex(txn_, ns, name, table, schema);
 }
 
+//TODO(Tianhan): newly added
+sequence_oid_t CatalogAccessor::CreateSequence(std::string name, int32_t seq_start,
+        int32_t seq_increment, int32_t seq_max_value, int32_t seq_min_value, int32_t seq_cache,
+        bool seq_cycle) const {
+    NormalizeObjectName(&name);
+    return dbc_->CreateSequence(txn_, name, seq_start, seq_increment, seq_max_value, seq_min_value, seq_cache,
+        seq_cycle);
+}
+
 const IndexSchema &CatalogAccessor::GetIndexSchema(index_oid_t index) const {
   return dbc_->GetIndexSchema(txn_, index);
 }
 
 bool CatalogAccessor::DropIndex(index_oid_t index) const { return dbc_->DeleteIndex(txn_, index); }
+
+bool CatalogAccessor::DropSequence(sequence_oid_t index) const { return dbc_->DropSequence(txn_, index); }
 
 bool CatalogAccessor::SetIndexPointer(index_oid_t index, storage::index::Index *index_ptr) const {
   return dbc_->SetIndexPointer(txn_, index, index_ptr);

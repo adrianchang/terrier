@@ -7,6 +7,7 @@ class AnalyzePlanNode;
 class CreateDatabasePlanNode;
 class CreateFunctionPlanNode;
 class CreateIndexPlanNode;
+class CreateSequencePlanNode;
 class CreateNamespacePlanNode;
 class CreateTablePlanNode;
 class CreateTriggerPlanNode;
@@ -69,6 +70,12 @@ class PlanVisitor {
    * @param plan CreateIndexPlanNode
    */
   virtual void Visit(UNUSED_ATTRIBUTE const CreateIndexPlanNode *plan) {}
+
+  /**
+   * Visit an CreateIndexPlanNode
+   * @param plan CreateIndexPlanNode
+   */
+  virtual void Visit(UNUSED_ATTRIBUTE const CreateSequencePlanNode *plan) {}
 
   /**
    * Visit an CreateNamespacePlanNode

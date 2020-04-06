@@ -196,6 +196,30 @@ class DatabaseCatalog {
    */
   bool DeleteIndex(common::ManagedPointer<transaction::TransactionContext> txn, index_oid_t index);
 
+  //TODO(Tianhan): newly added
+    /**
+     * Create a sequence
+     * @param txn for the operation
+     * @param name of the new sequence
+     * @param sequence_start Start value of the sequence
+     * @param sequence_min Minimum value of the sequence
+     * @param sequence_max Maximum value of the sequence
+     * @return OID of the new sequence or INVALID_SEQUENCE_OID if failed
+     */
+
+  sequence_oid_t CreateSequence(common::ManagedPointer<transaction::TransactionContext> txn, const std::string name,
+            int32_t sequence_start, int32_t sequence_increment, int32_t sequence_max_value,
+            int32_t sequence_min_value, int32_t sequence_cache, bool sequence_cycle);
+
+
+    /**
+     * Drop a sequence
+     * @param txn for the operation
+     * @param index of the sequence to be dropped
+     * @return true if drop is successful
+     */
+    bool DropSequence(common::ManagedPointer<transaction::TransactionContext> txn, sequence_oid_t index);
+
   /**
    * Resolve an index name to its OID
    * @param txn for the operation

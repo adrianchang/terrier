@@ -9,6 +9,7 @@
 #include "planner/plannodes/create_database_plan_node.h"
 #include "planner/plannodes/create_function_plan_node.h"
 #include "planner/plannodes/create_index_plan_node.h"
+#include "planner/plannodes/create_sequence_plan_node.h"
 #include "planner/plannodes/create_namespace_plan_node.h"
 #include "planner/plannodes/create_table_plan_node.h"
 #include "planner/plannodes/create_trigger_plan_node.h"

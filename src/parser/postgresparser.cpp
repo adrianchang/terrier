@@ -1243,6 +1243,8 @@ std::unique_ptr<parser::SQLStatement> PostgresParser::CreateSequenceTransform(Pa
   int64_t cache_value = 0;
   bool cycle_value = false;
 
+  auto sequence_name = root->sequence_->relname_;
+
   for (auto cell = root->options_->head; cell != nullptr; cell = cell->next) {
     auto def_elem = reinterpret_cast<DefElem *>(cell->data.ptr_value);
 
@@ -1288,6 +1290,7 @@ std::unique_ptr<parser::SQLStatement> PostgresParser::CreateSequenceTransform(Pa
   }
 
   auto result = std::make_unique<CreateStatement>(std::move(table_info), CreateStatement::CreateType::kSequence,
+                                                  sequence_name,
                                                   start_value,
                                                   increment_value,
                                                   maxvalue_value,

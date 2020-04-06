@@ -12,6 +12,7 @@
 #include "planner/plannodes/create_index_plan_node.h"
 #include "planner/plannodes/create_namespace_plan_node.h"
 #include "planner/plannodes/create_table_plan_node.h"
+#include "planner/plannodes/create_sequence_plan_node.h"
 #include "planner/plannodes/drop_database_plan_node.h"
 #include "planner/plannodes/drop_index_plan_node.h"
 #include "planner/plannodes/drop_namespace_plan_node.h"
@@ -104,6 +105,19 @@ bool DDLExecutors::CreateIndexExecutor(const common::ManagedPointer<planner::Cre
                                        const common::ManagedPointer<catalog::CatalogAccessor> accessor) {
   return CreateIndex(accessor, node->GetNamespaceOid(), node->GetIndexName(), node->GetTableOid(),
                      *(node->GetSchema()));
+}
+
+//TODO(Tianhan): newly added
+bool DDLExecutors::CreateSequenceExecutor(common::ManagedPointer<planner::CreateSequencePlanNode> node,
+                                       common::ManagedPointer<catalog::CatalogAccessor> accessor) {
+    const auto sequence_oid = accessor->CreateSequence(node->GetSequenceName(), node->GetSequenceStart(), node->GetSequenceIncrement(),
+            node->GetSequenceMaxValue(), node->GetSequenceMinValue(), node->GetSequenceCache(),
+            node->GetSequenceCycle());
+    if (sequence_oid == catalog::INVALID_SEQUENCE_OID) {
+        // Catalog wasn't able to proceed, txn must now abort
+        return false;
+    }
+    return true;
 }
 
 bool DDLExecutors::DropDatabaseExecutor(const common::ManagedPointer<planner::DropDatabasePlanNode> node,

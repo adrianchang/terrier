@@ -230,6 +230,13 @@ class CatalogAccessor {
    */
   index_oid_t CreateIndex(namespace_oid_t ns, table_oid_t table, std::string name, const IndexSchema &schema) const;
 
+  //TODO(Tianhan): newly added
+  sequence_oid_t CreateSequence(std::string name, int32_t seq_start,
+                                int32_t seq_increment, int32_t seq_max_value, int32_t seq_min_value, int32_t seq_cache,
+                                bool seq_cycle) const;
+
+  bool DropSequence(sequence_oid_t index) const;
+
   /**
    * Gets the schema that was used to define the index
    * @param index corresponding to the requested key schema, this must be a valid oid from GetIndexOid. Invalid input
