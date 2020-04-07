@@ -1347,6 +1347,8 @@ const char *OperatorNodeContents<CreateFunction>::name = "CreateFunction";
 template <>
 const char *OperatorNodeContents<CreateNamespace>::name = "CreateNamespace";
 template <>
+const char *OperatorNodeContents<CreateSequence>::name = "CreateSequence";
+template <>
 const char *OperatorNodeContents<CreateTrigger>::name = "CreateTrigger";
 template <>
 const char *OperatorNodeContents<CreateView>::name = "CreateView";
@@ -1414,7 +1416,9 @@ template <>
 OpType OperatorNodeContents<ExportExternalFile>::type = OpType::EXPORTEXTERNALFILE;
 template <>
 OpType OperatorNodeContents<CreateDatabase>::type = OpType::CREATEDATABASE;
-template <>
+template<>
+OpType OperatorNodeContents<CreateSequence>::type = OpType::CREATESEQUENCE;
+template<>
 OpType OperatorNodeContents<CreateTable>::type = OpType::CREATETABLE;
 template <>
 OpType OperatorNodeContents<CreateIndex>::type = OpType::CREATEINDEX;

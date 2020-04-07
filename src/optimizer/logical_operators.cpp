@@ -1329,6 +1329,8 @@ const char *OperatorNodeContents<LogicalCreateIndex>::name = "LogicalCreateIndex
 template <>
 const char *OperatorNodeContents<LogicalCreateFunction>::name = "LogicalCreateFunction";
 template <>
+const char *OperatorNodeContents<LogicalCreateSequence>::name = "LogicalCreateSequence";
+template <>
 const char *OperatorNodeContents<LogicalCreateNamespace>::name = "LogicalCreateNamespace";
 template <>
 const char *OperatorNodeContents<LogicalCreateTrigger>::name = "LogicalCreateTrigger";
@@ -1398,6 +1400,8 @@ template <>
 OpType OperatorNodeContents<LogicalCreateTable>::type = OpType::LOGICALCREATETABLE;
 template <>
 OpType OperatorNodeContents<LogicalCreateIndex>::type = OpType::LOGICALCREATEINDEX;
+template <>
+OpType OperatorNodeContents<LogicalCreateSequence>::type = OpType::LOGICALCREATESEQUENCE;
 template <>
 OpType OperatorNodeContents<LogicalCreateFunction>::type = OpType::LOGICALCREATEFUNCTION;
 template <>
