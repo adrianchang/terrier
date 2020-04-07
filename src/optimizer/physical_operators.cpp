@@ -791,6 +791,53 @@ bool CreateDatabase::operator==(const BaseOperatorNodeContents &r) {
   return node.database_name_ == database_name_;
 }
 
+//TODO(Tianhan): newly added
+//===--------------------------------------------------------------------===//
+// CreateSequence
+//===--------------------------------------------------------------------===//
+BaseOperatorNodeContents *CreateSequence::Copy() const { return new CreateSequence(*this); }
+
+Operator CreateSequence::Make(std::string sequence_name, int32_t sequence_start,
+                                     int32_t sequence_increment, int32_t sequence_max_value,
+                                     int32_t sequence_min_value, int32_t sequence_cache,
+                                     bool sequence_cycle) {
+    auto op = std::make_unique<CreateSequence>();
+    op->sequence_name_ = sequence_name;
+    op->sequence_start_ = sequence_start;
+    op->sequence_increment_ = sequence_increment;
+    op->sequence_max_value_ = sequence_max_value;
+    op->sequence_min_value_ = sequence_min_value;
+    op->sequence_cache_ = sequence_cache;
+    op->sequence_cycle_ = sequence_cycle;
+    return Operator(std::move(op));
+}
+
+common::hash_t CreateSequence::Hash() const {
+    common::hash_t hash = BaseOperatorNodeContents::Hash();
+    hash = common::HashUtil::CombineHashes(hash, common::HashUtil::Hash(sequence_name_));
+    hash = common::HashUtil::CombineHashes(hash, common::HashUtil::Hash(sequence_start_));
+    hash = common::HashUtil::CombineHashes(hash, common::HashUtil::Hash(sequence_increment_));
+    hash = common::HashUtil::CombineHashes(hash, common::HashUtil::Hash(sequence_max_value_));
+    hash = common::HashUtil::CombineHashes(hash, common::HashUtil::Hash(sequence_min_value_));
+    hash = common::HashUtil::CombineHashes(hash, common::HashUtil::Hash(sequence_cache_));
+    hash = common::HashUtil::CombineHashes(hash, common::HashUtil::Hash(sequence_cycle_));
+    return hash;
+}
+
+bool CreateSequence::operator==(const BaseOperatorNodeContents &r) {
+    if (r.GetType() != OpType::CREATEINDEX) return false;
+    const CreateSequence &node = *dynamic_cast<const CreateSequence *>(&r);
+    if (sequence_name_ != node.sequence_name_) return false;
+    if (sequence_start_ != node.sequence_start_) return false;
+    if (sequence_increment_ != node.sequence_increment_) return false;
+    if (sequence_max_value_ != node.sequence_max_value_) return false;
+    if (sequence_min_value_ != node.sequence_min_value_) return false;
+    if (sequence_cache_ != node.sequence_cache_) return false;
+    if (sequence_cycle_ != node.sequence_cycle_) return false;
+    return (true);
+}
+
+
 //===--------------------------------------------------------------------===//
 // CreateTable
 //===--------------------------------------------------------------------===//

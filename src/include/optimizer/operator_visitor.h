@@ -162,6 +162,12 @@ class OperatorVisitor {
    */
   virtual void Visit(const CreateDatabase *create_database) {}
 
+/**
+ * Visit a CreateSequence operator
+ * @param create_sequence operator
+ */
+  virtual void Visit(const CreateSequence *create_sequence) {}
+
   /**
    * Visit a CreateFunction operator
    * @param create_function operator
@@ -364,6 +370,12 @@ class OperatorVisitor {
    * @param logical_create_database operator
    */
   virtual void Visit(const LogicalCreateDatabase *logical_create_database) {}
+
+/**
+ * Visit a LogicalCreateSequence operator
+ * @param logical_create_sequence operator
+ */
+  virtual void Visit(const LogicalCreateSequence *logical_create_sequence) {}
 
   /**
    * Visit a LogicalCreateFunction operator

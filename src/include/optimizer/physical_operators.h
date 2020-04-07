@@ -1351,6 +1351,69 @@ class CreateTable : public OperatorNodeContents<CreateTable> {
 };
 
 /**
+ * Logical operator for CreateSequence
+ */
+class CreateSequence : public OperatorNodeContents<CreateSequence> {
+public:
+    static Operator Make(std::string sequence_name, int32_t sequence_start,
+                         int32_t sequence_increment, int32_t sequence_max_value,
+                         int32_t sequence_min_value, int32_t sequence_cache,
+                         bool sequence_cycle);
+    /**
+     * Copy
+     * @returns copy of this
+     */
+    BaseOperatorNodeContents *Copy() const override;
+
+    bool operator==(const BaseOperatorNodeContents &r) override;
+    common::hash_t Hash() const override;
+
+    /**
+     * @return name of the sequence
+     */
+    const std::string &GetSequenceName() const { return sequence_name_; }
+
+    /**
+     * @return start of the sequence
+     */
+    const int32_t &GetSequenceStart() const { return sequence_start_; }
+
+    /**
+     * @return increment of the sequence
+     */
+    const int32_t &GetSequenceIncrement() const { return sequence_increment_; }
+
+    /**
+     * @return max_value of the sequence
+     */
+    const int32_t &GetSequenceMaxValue() const { return sequence_max_value_; }
+
+    /**
+     * @return min_value of the sequence
+     */
+    const int32_t &GetSequenceMinValue() const { return sequence_min_value_; }
+
+    /**
+     * @return cache size of the sequence
+     */
+    const int32_t &GetSequenceCache() const { return sequence_cache_; }
+
+    /**
+     * @return cycle of the sequence
+     */
+    const bool &GetSequenceCycle() const { return sequence_cycle_; }
+private:
+    std::string sequence_name_;
+    int32_t sequence_start_;
+    int32_t sequence_increment_;
+    int32_t sequence_max_value_;
+    int32_t sequence_min_value_;
+    int32_t sequence_cache_;
+    bool sequence_cycle_;
+};
+
+
+/**
  * Physical operator for CreateIndex
  */
 class CreateIndex : public OperatorNodeContents<CreateIndex> {
