@@ -191,6 +191,9 @@ void BindNodeVisitor::Visit(common::ManagedPointer<parser::CreateStatement> node
       if (node->GetTriggerWhen() != nullptr)
         node->GetTriggerWhen()->Accept(common::ManagedPointer(this).CastManagedPointerTo<SqlNodeVisitor>());
       break;
+    case parser::CreateStatement::CreateType::kSequence:
+      ValidateDatabaseName(node->GetDatabaseName());
+      break;
     case parser::CreateStatement::CreateType::kSchema:
       // nothing for binder to handler
       break;
@@ -511,14 +514,21 @@ void BindNodeVisitor::Visit(common::ManagedPointer<parser::UpdateStatement> node
       if (expr->GetReturnValueType() != expected_ret_type) {
         sherpa_->ReportFailure("BindNodeVisitor tried to cast, but the cast result type does not match the schema.");
       }
-      sherpa_->SetDesiredType(common::ManagedPointer(child), expr->GetReturnValueType());
-      update->ResetValue(common::ManagedPointer(child));
-      sherpa_->GetParseResult()->AddExpression(std::move(child));
-      expr = update->GetUpdateValue();
-    }
 
-    sherpa_->SetDesiredType(expr, expected_ret_type);
-    expr->Accept(common::ManagedPointer(this).CastManagedPointerTo<SqlNodeVisitor>());
+      break;
+    case parser::DropStatement::DropType::kSequence:
+      ValidateDatabaseName(node->GetDatabaseName());
+      if (catalog_accessor_->GetSequenceOid(node->GetSequenceName()) == catalog::INVALID_SEQUENCE_OID) {
+        throw BINDER_EXCEPTION("Sequence does not exist");
+      }
+      break;
+    case parser::DropStatement::DropType::kTrigger:
+      // TODO(Ling): Get Trigger OID in catalog?
+    case parser::DropStatement::DropType::kSchema:
+    case parser::DropStatement::DropType::kView:
+      // TODO(Ling): Get View OID in catalog?
+    case parser::DropStatement::DropType::kPreparedStatement:
+      break;
   }
 
   SqlNodeVisitor::Visit(node);
