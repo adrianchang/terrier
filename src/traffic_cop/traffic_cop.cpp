@@ -334,8 +334,8 @@ TrafficCopResult TrafficCop::RunExecutableQuery(const common::ManagedPointer<net
   // UDF currval will throw exception.
   try {
     exec_query->Run(common::ManagedPointer(exec_ctx), execution::vm::ExecutionMode::Interpret);
-  }catch (...) {
-    return {ResultType::ERROR, "Query failed."};
+  }catch (Exception& exception) {
+    return {ResultType::ERROR, "Query failed. " + std::string(exception.what())};
   }
 
 
