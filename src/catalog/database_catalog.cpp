@@ -1396,7 +1396,7 @@ bool DatabaseCatalog::CreateSequence(common::ManagedPointer<transaction::Transac
   const auto next_col_oid_offset = pg_class_all_cols_prm_[postgres::REL_NEXTCOLOID_COL_OID];
   class_insert_pr->SetNull(next_col_oid_offset);
 
-  // Set sequence_ptr to NULL because it gets set by execution layer after instantiation
+  // Create new SequenceMetaData object to hold the data. Store pointer in pg_class.
   const auto index_ptr_offset = pg_class_all_cols_prm_[postgres::REL_PTR_COL_OID];
   auto *const sequence_ptr = class_insert_pr->AccessForceNotNull(index_ptr_offset);
   SequenceMetadata *seq_obj = new SequenceMetadata();
@@ -1442,8 +1442,7 @@ bool DatabaseCatalog::CreateSequence(common::ManagedPointer<transaction::Transac
   const auto result UNUSED_ATTRIBUTE = classes_namespace_index_->Insert(txn, *index_pr, class_tuple_slot);
   TERRIER_ASSERT(result, "Insertion into non-unique namespace index failed.");
 
-  // TODO(zianke): Next, insert sequence metadata into pg_sequence
-
+  // Next, insert sequence metadata into pg_sequence
   auto *const sequences_insert_redo = txn->StageWrite(db_oid_, postgres::SEQUENCE_TABLE_OID, pg_sequence_all_cols_pri_);
   auto *const sequences_insert_pr = sequences_insert_redo->Delta();
   // Write the sequence_oid into the PR
@@ -2056,15 +2055,17 @@ void DatabaseCatalog::BootstrapProcs(const common::ManagedPointer<transaction::T
   // lower
   CreateProcedure(txn, postgres::LOWER_PRO_OID, "lower", postgres::INTERNAL_LANGUAGE_OID,
                   postgres::NAMESPACE_DEFAULT_NAMESPACE_OID, {"str"}, {str_type}, {str_type}, {}, str_type, "", true);
+  // length
   CreateProcedure(txn, postgres::LENGTH_PRO_OID, "length", postgres::INTERNAL_LANGUAGE_OID,
                   postgres::NAMESPACE_DEFAULT_NAMESPACE_OID, {"str"}, {str_type}, {str_type}, {}, integer_type, "", true);
+  // nextval
   CreateProcedure(txn, postgres::NEXTVAL_PRO_OID, "nextval", postgres::INTERNAL_LANGUAGE_OID,
                   postgres::NAMESPACE_DEFAULT_NAMESPACE_OID, {"str"}, {str_type}, {str_type}, {}, integer_type, "", true);
-
+  // currval
   CreateProcedure(txn, postgres::CURRVAL_PRO_OID, "currval", postgres::INTERNAL_LANGUAGE_OID,
                   postgres::NAMESPACE_DEFAULT_NAMESPACE_OID, {"str"}, {str_type}, {str_type}, {}, integer_type, "", true);
 
-    // TODO(tanujnay112): no op codes for lower and upper yet
+  // TODO(tanujnay112): no op codes for lower and upper yet
 
   BootstrapProcContexts(txn);
 }
